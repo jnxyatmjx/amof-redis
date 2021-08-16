@@ -10,7 +10,7 @@ endif
 
 PRG := ./amof-redis
 
-SOURCEALL :=$(shell find ./src/ ./inc/ ./ -maxdepth 1 -iname "*.c" -o -iname "*.cpp" -o -iname "*.cc" -o -iname "*.h")
+SOURCEALL :=$(shell find ./ -maxdepth 1 -iname "*.c" -o -iname "*.cpp" -o -iname "*.cc" -o -iname "*.h")
 #SRC := $(wildcard src/*.cpp)
 
 OBJCXX := $(patsubst %.cpp,%.o,$(filter %.cpp, $(SOURCEALL)))
@@ -19,7 +19,7 @@ OBJC  := $(patsubst %.c,%.o,$(filter %.c, $(SOURCEALL)))
 CXX := g++
 GCC := gcc
 
-INC := -I./ \
+INC := -I./
 
 LIB := -L./hiredis -Wl,-Bstatic -lhiredis \
        -Wl,-Bdynamic -lrt -lz -lc -lpthread
