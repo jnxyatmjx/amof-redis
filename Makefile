@@ -1,10 +1,12 @@
 ifeq	($(release),1)
 
-FLG := -O3 -Werror -fPIC -D_LINUX_SYS --std=c++11
+CFLG := -Wall -Werror -std=c99
+FLG := -O3 -Werror -fPIC -D_LINUX_SYS -std=c++11
 
 else
 
-FLG := -O0 -Werror -g -fPIC -D_LINUX_SYS --std=c++11
+CFLG := -g3 -Wall -Werror -std=c99
+FLG := -O0 -Werror -g3 -fPIC -D_LINUX_SYS -std=c++11
 
 endif
 
@@ -24,9 +26,6 @@ INC := -I./
 LIB := -L./hiredis -Wl,-Bstatic -lhiredis \
        -Wl,-Bdynamic -lrt -lz -lc -lpthread
 
-#for c
-CFLAGS		= -g -Wall -Werror 
-
 .PHONY: clean	
 	
 $(PRG): $(OBJCXX) $(OBJC)
@@ -36,7 +35,7 @@ $(PRG): $(OBJCXX) $(OBJC)
 	$(CXX) $(FLG) -o $@ -c $< $(INC)
 
 %.o: %.c
-	$(GCC) $(CFLAGS) -o $@ -c $<
+	$(GCC) $(CFLG) -o $@ -c $<
 
 clean:
 	rm -f $(OBJCXX) $(OBJC) $(PRG)
