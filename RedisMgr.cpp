@@ -311,7 +311,7 @@ std::string RedisMgr::getCurrTime()
 	struct tm Tm;
 	time_t curSec = time(0);
 	localtime_r(&curSec, &Tm);
-	char tbuf[32] = { 0 };
+	char tbuf[128] = { 0 };
 	sprintf(tbuf, "%04d/%02d/%02d %02d:%02d:%02d", Tm.tm_year + 1900, Tm.tm_mon + 1, Tm.tm_mday,
 		Tm.tm_hour,Tm.tm_min,Tm.tm_sec);
 	return std::move(std::string(tbuf));
