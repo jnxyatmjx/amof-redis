@@ -1,0 +1,76 @@
+
+
+
+
+1、initialize a connection pool for each master node
+2、then Cache the mapping relationship between the node and the connection pool, 
+and all the slots and the connection pool that the node is responsible for, into the two maps mentioned above
+
+
+
+
+
+发现slot--node--connection
+
+initializeSlotsCache
+	discoverClusterNodesAndSlots
+
+
+发送重试机制
+	runWithRetries
+		renewClusterSlots
+		
+		
+		
+		
+		
+	
+	sudo systemctl status firewalld
+	sudo systemctl start firewalld
+	
+	
+	firewall-cmd --zone=public --permanent --remove-port=16001/tcp
+	
+	firewall-cmd --zone=public --permanent --add-port=16001/tcp
+	
+	
+	CLUSTER COUNTKEYSINSLOT 15241  返回槽15241所对应key数量 --》数量为 1 
+	CLUSTER GETKEYSINSLOT 15241 2  返回槽15241所对应key值 值为 --》ppm_lis_df_hash
+	
+	
+	10.10.84.161  0de3e645b1d4d9aa66ffa4c794f4fe872c5c828e
+	10.10.84.163  61383405b81a82a1d88dfd13db26ee42d3c626b9  [15241 -- ppm_lis_df_hash]
+	目标是将槽 15241 从 84.63 转移至 84.61
+	
+	1、进入84.161 执行 CLUSTER SETSLOT 15241 importing 0de3e645b1d4d9aa66ffa4c794f4fe872c5c828e   [目标节点做好准备]
+	2、进入84.163 执行 CLUSTER SETSLOT 15241 migrating 61383405b81a82a1d88dfd13db26ee42d3c626b9   [源节点做好准备]
+	3、进入84.163 执行 MIGRATE 10.10.84.161 6001 ppm_lis_df_hash 0 3600 auth test123					[开始移动数据 key所在的节点]
+	4、任意节点 发送通知 CLUSTER SETSLOT 15241 NODE 0de3e645b1d4d9aa66ffa4c794f4fe872c5c828e		[向集群发送通知]
+	
+	
+	CLUSTER SETSLOT 15241 importing 61383405b81a82a1d88dfd13db26ee42d3c626b9  
+	CLUSTER SETSLOT 15241 migrating 0de3e645b1d4d9aa66ffa4c794f4fe872c5c828e
+	MIGRATE 10.10.84.163 6001 ppm_lis_df_hash 0 3600 auth test123
+	CLUSTER SETSLOT 15241 NODE 61383405b81a82a1d88dfd13db26ee42d3c626b9	
+	
+	84.162 	be2de67b5993164d718579608e6b382f00c81e72   [8568]移动至 84.161
+	84.161  0de3e645b1d4d9aa66ffa4c794f4fe872c5c828e
+	
+	1、进入84.161 执行 CLUSTER SETSLOT 8568 importing 0de3e645b1d4d9aa66ffa4c794f4fe872c5c828e
+	2、进入84.162 执行 CLUSTER SETSLOT 8568 migrating be2de67b5993164d718579608e6b382f00c81e72   [源节点做好准备]
+	3、进入84.162 执行 MIGRATE 10.10.84.161 6001 us_stkqt_list8 0 3600 auth test123					[开始移动数据 key所在的节点]
+	4、任意节点 发送通知 CLUSTER SETSLOT 8568 NODE 0de3e645b1d4d9aa66ffa4c794f4fe872c5c828e		[向集群发送通知]
+	
+	10.10.84.61  0de3e645b1d4d9aa66ffa4c794f4fe872c5c828e   [2683  ppm_lis_df]
+	10.10.84.63  61383405b81a82a1d88dfd13db26ee42d3c626b9
+	
+	1 -->  84.63 >> CLUSTER SETSLOT 2683 importing 61383405b81a82a1d88dfd13db26ee42d3c626b9
+	2 -->  84.61 >> CLUSTER SETSLOT 2683 migrating 0de3e645b1d4d9aa66ffa4c794f4fe872c5c828e
+	3 -->  84.63 >> MIGRATE 10.10.84.163 6001 ppm_lis_df 0 3600 auth test123
+	4 -->		 >> CLUSTER SETSLOT 2683 NODE 61383405b81a82a1d88dfd13db26ee42d3c626b9
+	
+	
+	CLUSTER SETSLOT 2683 importing 0de3e645b1d4d9aa66ffa4c794f4fe872c5c828e 
+	CLUSTER SETSLOT 2683 migrating 61383405b81a82a1d88dfd13db26ee42d3c626b9
+    MIGRATE 10.10.84.161 6001 ppm_lis_df 0 3600 auth test123
+    CLUSTER SETSLOT 2683 NODE 0de3e645b1d4d9aa66ffa4c794f4fe872c5c828e
